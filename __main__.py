@@ -3,6 +3,7 @@ import random
 from PySide6 import QtCore, QtWidgets, QtGui
 import stltovoxel
 import binvox_rw
+import numpy as np
 
 class MyWidget(QtWidgets.QWidget):
     def __init__(self):
@@ -23,7 +24,11 @@ class MyWidget(QtWidgets.QWidget):
     @QtCore.Slot()
     def magic(self):
         self.text.setText(random.choice(self.hello))
+        print("----")
         stltovoxel.convert_file('3DBenchy.stl', 'output.npy')
+        print("stl to voxel finished")
+        data = np.load('output.npy')
+        print(data)
 
 
 if __name__ == "__main__":
