@@ -4,6 +4,9 @@ from PySide6 import QtCore, QtWidgets, QtGui
 import stltovoxel
 import binvox_rw
 import numpy as np
+import vtkplotlib as vpl
+from stl.mesh import Mesh
+
 
 class MyWidget(QtWidgets.QWidget):
     def __init__(self):
@@ -32,6 +35,12 @@ class MyWidget(QtWidgets.QWidget):
         with open("3dbenchy.binvox", 'rb') as file:
             data2 = np.int32(binvox_rw.read_as_3d_array(file).data)
             print(data2)
+        
+        mesh = Mesh.from_file("Mill2.stl")
+        fig = vpl.figure()
+        mesh = vpl.mesh_plot(mesh)
+        vpl.show()
+        
 
 
 
