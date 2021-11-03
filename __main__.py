@@ -27,11 +27,11 @@ class MyWidget(QtWidgets.QWidget):
         print("----")
         stltovoxel.convert_file('3DBenchy.stl', 'output.npy')
         print("stl to voxel finished")
-        data = np.load('output.npy')
+        data = np.int32(np.load('output.npy'))
         print(data)
-        voxel = binvox_rw.Voxels(data, )
-        with open("o.binwox", "w") as fp:
-            binvox_rw.write(voxel, fp)
+        with open("3dbenchy.binvox", 'rb') as file:
+            data2 = np.int32(binvox_rw.read_as_3d_array(file).data)
+            print(data2)
 
 
 
