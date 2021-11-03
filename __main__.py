@@ -29,6 +29,10 @@ class MyWidget(QtWidgets.QWidget):
         print("stl to voxel finished")
         data = np.load('output.npy')
         print(data)
+        voxel = binvox_rw.Voxels(data, )
+        with open("o.binwox", "w") as fp:
+            binvox_rw.write(voxel, fp)
+
 
 
 if __name__ == "__main__":
