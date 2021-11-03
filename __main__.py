@@ -1,6 +1,8 @@
 import sys
 import random
 from PySide6 import QtCore, QtWidgets, QtGui
+import stltovoxel
+import binvox_rw
 
 class MyWidget(QtWidgets.QWidget):
     def __init__(self):
@@ -21,6 +23,8 @@ class MyWidget(QtWidgets.QWidget):
     @QtCore.Slot()
     def magic(self):
         self.text.setText(random.choice(self.hello))
+        stltovoxel.convert_file('3DBenchy.stl', 'output.npy')
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
