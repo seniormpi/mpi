@@ -2,10 +2,17 @@ import sys
 import random
 from PySide6 import QtCore, QtWidgets, QtGui
 import stltovoxel
+from voxlib import voxelize
 import binvox_rw
 import numpy as np
 import vtkplotlib as vpl
 from stl.mesh import Mesh
+import simple_3dviz
+from simple_3dviz.window import show
+from simple_3dviz.behaviours.movements import CameraTrajectory
+from simple_3dviz.behaviours.trajectory import Circle
+from simple_3dviz.utils import render
+
 
 
 class MyWidget(QtWidgets.QWidget):
@@ -52,21 +59,36 @@ class MyWidget(QtWidgets.QWidget):
     @QtCore.Slot()
     def convert_binvox(self):
     
-        stltovoxel.convert_file('3DBenchy.stl', 'output.npy')
+        for pos_x, pos_y, pos_z in voxelize.voxelize('3DBenchy.stl', 48):
+            sys.stdout.write("{}\t{}\t{}\n".format(pos_x, pos_y, pos_z))
+
         print("stl to voxel finished")
+        np.set_printoptions(threshold=np.inf)
         data = np.int32(np.load('output.npy'))
         print(data)
 
-        with open("3dbenchy.binvox", 'rb') as file:
-            data2 = np.int32(binvox_rw.read_as_3d_array(file).data)
+        print("---")
+        with open("mill2.binvox", 'rb') as file:
+            data2 = np.int32(binvox_rw.read_as_coord_array(file).data)
             print(data2)
+        print("---")
 
     #binvox model görüntüleme
     @QtCore.Slot()
     def show_binvox(self):
-
         print("will show binvox")
         #TODO binvox gösterme
+
+        with open('3dbenchy.binvox', 'rb') as f:
+            model = binvox_rw.read_as_3d_array(f)
+
+        import matplotlib.pyplot as plt
+        fig = plt.figure()
+        ax = fig.gca(projection='3d')
+
+        ax.voxels(model.data, edgecolor="k")
+        plt.show()
+
 
     #predict
     @QtCore.Slot()
