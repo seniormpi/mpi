@@ -1,5 +1,7 @@
 import sys
 from PySide6 import QtCore, QtWidgets, QtGui
+from PySide6.QtWidgets import QVBoxLayout
+
 import binvox_rw
 import numpy as np
 import vtkplotlib as vpl
@@ -16,33 +18,32 @@ class MyWidget(QtWidgets.QWidget):
         self.items = 0
         self.select_stl_btn = QtWidgets.QPushButton("Select Stl Model")
         self.view_stl_btn = QtWidgets.QPushButton("View Stl Model")
-        self.convert_stl_to_binwox_btn = QtWidgets.QPushButton("Convert to Binvox")
-        self.view_binwox_btn = QtWidgets.QPushButton("View Binvox Model")
+        self.convert_stl_to_binvox_btn = QtWidgets.QPushButton("Convert to Binvox")
+        self.view_binvox_btn = QtWidgets.QPushButton("View Binvox Model")
         self.predict_btn = QtWidgets.QPushButton("Predict model")
 
+        # default disabled buttons
         self.view_stl_btn.setEnabled(False)
-        self.convert_stl_to_binwox_btn.setEnabled(False)
-        self.view_binwox_btn.setEnabled(False)
+        self.convert_stl_to_binvox_btn.setEnabled(False)
+        self.view_binvox_btn.setEnabled(False)
         self.predict_btn.setEnabled(False)
-
-        # right
-        self.right = QtWidgets.QBoxLayout(QtWidgets.QBoxLayout.Direction.TopToBottom)
-        self.right.addWidget(self.select_stl_btn)
-        self.right.addWidget(self.view_stl_btn)
-        self.right.addWidget(self.convert_stl_to_binwox_btn)
-        self.right.addWidget(self.view_binwox_btn)
-        self.right.addWidget(self.predict_btn)
-
-        self.layout = QtWidgets.QBoxLayout(QtWidgets.QBoxLayout.Direction.Up)
-
-        self.layout.addLayout(self.right)
-        self.setLayout(self.layout)
 
         self.select_stl_btn.clicked.connect(self.select_stl)
         self.view_stl_btn.clicked.connect(self.show_stl)
-        self.convert_stl_to_binwox_btn.clicked.connect(self.convert_binvox)
-        self.view_binwox_btn.clicked.connect(self.show_binvox)
+        self.convert_stl_to_binvox_btn.clicked.connect(self.convert_binvox)
+        self.view_binvox_btn.clicked.connect(self.show_binvox)
         self.predict_btn.clicked.connect(self.predict_out)
+
+        layout = QVBoxLayout()
+
+        layout.addWidget(self.select_stl_btn)
+        layout.addWidget(self.view_stl_btn)
+        layout.addWidget(self.convert_stl_to_binvox_btn)
+        layout.addWidget(self.view_binvox_btn)
+        layout.addWidget(self.predict_btn)
+
+        # Set the layout on the application's window
+        self.setLayout(layout)
 
     @QtCore.Slot()
     def select_stl(self):
@@ -52,8 +53,9 @@ class MyWidget(QtWidgets.QWidget):
 
         stl_path = filedialog.askopenfilename()
 
+        # enable next step buttons
         self.view_stl_btn.setEnabled(True)
-        self.convert_stl_to_binwox_btn.setEnabled(True)
+        self.convert_stl_to_binvox_btn.setEnabled(True)
 
     # stl model gösterme
     @QtCore.Slot()
@@ -68,7 +70,8 @@ class MyWidget(QtWidgets.QWidget):
     def convert_binvox(self):
         subprocess.call(['binvox.exe', '-c', '-d', '100', stl_path])
 
-        self.view_binwox_btn.setEnabled(True)
+        # enable next step buttons
+        self.view_binvox_btn.setEnabled(True)
         self.predict_btn.setEnabled(True)
 
     # binvox model görüntüleme
@@ -119,6 +122,7 @@ if __name__ == "__main__":
     widget = MyWidget()
     window = MainWindow(widget)
     window.resize(600, 400)
+    window.setWindowTitle("MPI CS491/2")
     window.show()
 
     sys.exit(app.exec())
