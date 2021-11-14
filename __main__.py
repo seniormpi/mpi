@@ -52,25 +52,15 @@ class MyWidget(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def select_stl(self):
-        global copied_stl_path
         global stl_path
         root = tk.Tk()
         root.withdraw()
 
         stl_path = filedialog.askopenfilename()
 
-        try:
-            subprocess.call('rmdir /q /s out', shell=True)
-
-            print("S")
-            subprocess.call('mkdir out', shell=True)
-            print(stl_path)
-            print(copied_stl_path)
-            copyfile(stl_path, copied_stl_path)
-        finally:
-            # enable next step buttons
-            self.view_stl_btn.setEnabled(True)
-            self.convert_stl_to_binvox_btn.setEnabled(True)
+        # enable next step buttons
+        self.view_stl_btn.setEnabled(True)
+        self.convert_stl_to_binvox_btn.setEnabled(True)
 
 
     # stl model gösterme
@@ -84,6 +74,13 @@ class MyWidget(QtWidgets.QWidget):
     # stl to binvox convert
     @QtCore.Slot()
     def convert_binvox(self):
+        global copied_stl_path
+        global stl_path
+
+        # clean create output directory
+        subprocess.call('rmdir /q /s out', shell=True)
+        subprocess.call('mkdir out', shell=True)
+        copyfile(stl_path, copied_stl_path)
         subprocess.call(['.\\executables\\binvox.exe', '-c', '-d', '100', copied_stl_path])
 
         # enable next step buttons
@@ -93,8 +90,7 @@ class MyWidget(QtWidgets.QWidget):
     # binvox model görüntüleme
     @QtCore.Slot()
     def show_binvox(self):
-        print(os.path.splitext(os.path.basename(stl_path))[0].lower())
-        with open(os.path.splitext(os.path.basename(stl_path).lower())[0] + ".binvox", 'rb') as f:
+        with open("./out/input.binvox", 'rb') as f:
             model = binvox_rw.read_as_3d_array(f)
 
         import matplotlib.pyplot as plt
