@@ -10,9 +10,14 @@ import tkinter as tk
 from tkinter import filedialog
 import subprocess
 import os
+from shutil import copyfile
+from subprocess import check_output
 
+copied_stl_path = ".\\out\\input.stl"
 
 class MyWidget(QtWidgets.QWidget):
+
+
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
         self.items = 0
@@ -47,15 +52,26 @@ class MyWidget(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def select_stl(self):
+        global copied_stl_path
         global stl_path
         root = tk.Tk()
         root.withdraw()
 
         stl_path = filedialog.askopenfilename()
 
-        # enable next step buttons
-        self.view_stl_btn.setEnabled(True)
-        self.convert_stl_to_binvox_btn.setEnabled(True)
+        try:
+            subprocess.call('rmdir /q /s out', shell=True)
+
+            print("S")
+            subprocess.call('mkdir out', shell=True)
+            print(stl_path)
+            print(copied_stl_path)
+            copyfile(stl_path, copied_stl_path)
+        finally:
+            # enable next step buttons
+            self.view_stl_btn.setEnabled(True)
+            self.convert_stl_to_binvox_btn.setEnabled(True)
+
 
     # stl model gösterme
     @QtCore.Slot()
@@ -68,7 +84,7 @@ class MyWidget(QtWidgets.QWidget):
     # stl to binvox convert
     @QtCore.Slot()
     def convert_binvox(self):
-        subprocess.call(['binvox.exe', '-c', '-d', '100', stl_path])
+        subprocess.call(['.\\executables\\binvox.exe', '-c', '-d', '100', copied_stl_path])
 
         # enable next step buttons
         self.view_binvox_btn.setEnabled(True)
