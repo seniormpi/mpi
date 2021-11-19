@@ -1,7 +1,7 @@
 import sys
 from PySide6 import QtCore, QtWidgets, QtGui
 from PySide6.QtWidgets import QVBoxLayout
-
+import numpy as np
 import binvox_rw
 import vtkplotlib as vpl
 from stl.mesh import Mesh
@@ -90,12 +90,16 @@ class MyWidget(QtWidgets.QWidget):
         with open("./out/input.binvox", 'rb') as f:
             model = binvox_rw.read_as_3d_array(f)
 
-        import matplotlib.pyplot as plt
-        fig = plt.figure()
-        ax = fig.gca(projection='3d')
+        from mayavi import mlab
 
-        ax.voxels(model.data, edgecolor="k")
-        plt.show()
+        xx, yy, zz = np.where(model.data == 1)
+
+        mlab.points3d(xx, yy, zz,
+                             mode="cube",
+                             color=(0, 1, 0),
+                             scale_factor=1)
+
+        mlab.show()
 
     # predict
     @QtCore.Slot()
