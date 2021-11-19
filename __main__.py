@@ -3,20 +3,17 @@ from PySide6 import QtCore, QtWidgets, QtGui
 from PySide6.QtWidgets import QVBoxLayout
 
 import binvox_rw
-import numpy as np
 import vtkplotlib as vpl
 from stl.mesh import Mesh
 import tkinter as tk
 from tkinter import filedialog
 import subprocess
-import os
 from shutil import copyfile
-from subprocess import check_output
 
 copied_stl_path = ".\\out\\input.stl"
 
-class MyWidget(QtWidgets.QWidget):
 
+class MyWidget(QtWidgets.QWidget):
 
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
@@ -59,9 +56,9 @@ class MyWidget(QtWidgets.QWidget):
         stl_path = filedialog.askopenfilename()
 
         # enable next step buttons
-        self.view_stl_btn.setEnabled(True)
-        self.convert_stl_to_binvox_btn.setEnabled(True)
-
+        if stl_path.endswith('.stl'):
+            self.view_stl_btn.setEnabled(True)
+            self.convert_stl_to_binvox_btn.setEnabled(True)
 
     # stl model gösterme
     @QtCore.Slot()
