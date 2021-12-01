@@ -59,12 +59,14 @@ class MyWidget(QtWidgets.QWidget):
         vertical_layout_1.addWidget(self.view_binvox_btn)
         vertical_layout_1.addWidget(self.predict_btn)
 
+        self.stl_label = QLabel("Please select a STL file", self)
+
         vertical_layout_2 = QVBoxLayout()
-        vertical_layout_2.addWidget(QLabel("My Label"), alignment=QtCore.Qt.AlignCenter)
-        vertical_layout_2.addWidget(QLabel("My Label", self), alignment=QtCore.Qt.AlignCenter)
-        vertical_layout_2.addWidget(QLabel("My Label", self), alignment=QtCore.Qt.AlignCenter)
-        vertical_layout_2.addWidget(QLabel("My Label", self), alignment=QtCore.Qt.AlignCenter)
-        vertical_layout_2.addWidget(QLabel("My Label", self), alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_2.addWidget(QLabel(""), alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_2.addWidget(self.stl_label, alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_2.addWidget(QLabel("", self), alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_2.addWidget(QLabel("", self), alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_2.addWidget(QLabel("The result will be here.", self), alignment=QtCore.Qt.AlignCenter)
 
         horizontal_layout_1.addLayout(vertical_layout_1)
         horizontal_layout_1.addLayout(vertical_layout_2)
@@ -84,6 +86,7 @@ class MyWidget(QtWidgets.QWidget):
         if stl_path.endswith('.stl'):
             self.view_stl_btn.setEnabled(True)
             self.convert_stl_to_binvox_btn.setEnabled(True)
+            self.stl_label.setText(stl_path)
 
     # stl model gösterme
     @QtCore.Slot()
