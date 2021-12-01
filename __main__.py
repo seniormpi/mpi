@@ -1,7 +1,7 @@
 import random
 import sys
 from PySide6 import QtCore, QtWidgets, QtGui
-from PySide6.QtWidgets import QVBoxLayout
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel
 import numpy as np
 import pandas as pd
 import binvox_rw
@@ -50,16 +50,27 @@ class MyWidget(QtWidgets.QWidget):
         self.view_binvox_btn.clicked.connect(self.show_binvox)
         self.predict_btn.clicked.connect(self.predict_out)
 
-        layout = QVBoxLayout()
+        horizontal_layout_1 = QHBoxLayout()
 
-        layout.addWidget(self.select_stl_btn)
-        layout.addWidget(self.view_stl_btn)
-        layout.addWidget(self.convert_stl_to_binvox_btn)
-        layout.addWidget(self.view_binvox_btn)
-        layout.addWidget(self.predict_btn)
+        vertical_layout_1 = QVBoxLayout()
+        vertical_layout_1.addWidget(self.select_stl_btn)
+        vertical_layout_1.addWidget(self.view_stl_btn)
+        vertical_layout_1.addWidget(self.convert_stl_to_binvox_btn)
+        vertical_layout_1.addWidget(self.view_binvox_btn)
+        vertical_layout_1.addWidget(self.predict_btn)
+
+        vertical_layout_2 = QVBoxLayout()
+        vertical_layout_2.addWidget(QLabel("My Label"), alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_2.addWidget(QLabel("My Label", self), alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_2.addWidget(QLabel("My Label", self), alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_2.addWidget(QLabel("My Label", self), alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_2.addWidget(QLabel("My Label", self), alignment=QtCore.Qt.AlignCenter)
+
+        horizontal_layout_1.addLayout(vertical_layout_1)
+        horizontal_layout_1.addLayout(vertical_layout_2)
 
         # Set the layout on the application's window
-        self.setLayout(layout)
+        self.setLayout(horizontal_layout_1)
 
     @QtCore.Slot()
     def select_stl(self):
