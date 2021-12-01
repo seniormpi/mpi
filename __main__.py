@@ -60,13 +60,14 @@ class MyWidget(QtWidgets.QWidget):
         vertical_layout_1.addWidget(self.predict_btn)
 
         self.stl_label = QLabel("Please select a STL file", self)
+        self.result_label = QLabel("The result will be here.", self)
 
         vertical_layout_2 = QVBoxLayout()
         vertical_layout_2.addWidget(QLabel(""), alignment=QtCore.Qt.AlignCenter)
         vertical_layout_2.addWidget(self.stl_label, alignment=QtCore.Qt.AlignCenter)
         vertical_layout_2.addWidget(QLabel("", self), alignment=QtCore.Qt.AlignCenter)
         vertical_layout_2.addWidget(QLabel("", self), alignment=QtCore.Qt.AlignCenter)
-        vertical_layout_2.addWidget(QLabel("The result will be here.", self), alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_2.addWidget(self.result_label, alignment=QtCore.Qt.AlignCenter)
 
         horizontal_layout_1.addLayout(vertical_layout_1)
         horizontal_layout_1.addLayout(vertical_layout_2)
@@ -162,6 +163,7 @@ class MyWidget(QtWidgets.QWidget):
         result[:,1][result[:,1] < 0.5] = 0
         result[:,0][result[:,0] < 0.5] = 0
         print("Classification Results", result)
+        self.result_label.setText(("Classification Results", result))
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, widget):
