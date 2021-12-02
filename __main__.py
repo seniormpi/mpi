@@ -1,5 +1,6 @@
 import random
 import sys
+from threading import local
 from PySide6 import QtCore, QtWidgets, QtGui
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel
 import numpy as np
@@ -23,6 +24,7 @@ from keras.layers.convolutional import Conv3D
 from keras.models import Model
 from keras import optimizers
 from keras import regularizers
+
 
 copied_stl_path = ".\\out\\input.stl"
 
@@ -123,10 +125,7 @@ class MyWidget(QtWidgets.QWidget):
 
         xx, yy, zz = np.where(model.data == 1)
 
-        mlab.points3d(xx, yy, zz,
-                             mode="cube",
-                             color=(0, 1, 0),
-                             scale_factor=1)
+        mlab.points3d(xx, yy, zz, mode="cube", color=(0, 1, 0), scale_factor=1)
 
         mlab.show()
 
@@ -149,10 +148,7 @@ class MyWidget(QtWidgets.QWidget):
         
         batch_input = []
         with open("./out/input.binvox", 'rb') as file:
-            try:
                 data = np.int32(binvox_rw.read_as_3d_array(file).data)
-            except:
-                print(file)
         model_input = np.reshape(data, (64, 64, 64, 1))
         batch_input += [model_input]
         batch_x = np.array(batch_input)
@@ -163,7 +159,7 @@ class MyWidget(QtWidgets.QWidget):
         result[:,1][result[:,1] < 0.5] = 0
         result[:,0][result[:,0] < 0.5] = 0
         print("Classification Results", result)
-        self.result_label.setText(("Classification Results", result))
+        self.result_label.setText(str(result))
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, widget):
