@@ -1,12 +1,12 @@
 import random
 import sys
 from threading import local
-from PySide6 import QtCore, QtWidgets, QtGui
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel
+from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel
 import numpy as np
 import pandas as pd
 import binvox_rw
-import vtkplotlib as vpl
+import vtkplotlib as vtk
 from stl.mesh import Mesh
 import tkinter as tk
 from tkinter import filedialog
@@ -14,11 +14,64 @@ import subprocess
 from shutil import copyfile
 import os
 
+from mayavi import mlab
+from mayavi.core.ui.api import MayaviScene, MlabSceneModel, \
+    SceneEditor
+from traits.api import HasTraits, Instance, on_trait_change
+from traitsui.api import View, Item
+
 from predict import predict
 
-
-
 copied_stl_path = ".\\out\\input.stl"
+
+
+################################################################################
+# The actual visualization
+class Visualization(HasTraits):
+    scene = Instance(MlabSceneModel, ())
+
+    @on_trait_change('scene.activated')
+    def update_plot(self):
+        # This function is called when the view is opened. We don't
+        # populate the scene when the view is not yet open, as some
+        # VTK features require a GLContext.
+
+        # We can do normal mlab calls on the embedded scene.
+        with open("./out/input.binvox", 'rb') as f:
+            model = binvox_rw.read_as_3d_array(f)
+
+        xx, yy, zz = np.where(model.data == 1)
+        self.scene.mlab.points3d(xx, yy, zz, mode="cube", color=(0, 1, 0), scale_factor=1)
+        #self.scene.mlab.test_points3d()
+
+    # the layout of the dialog screated
+    view = View(Item('scene', editor=SceneEditor(scene_class=MayaviScene),
+                     height=250, width=300, show_label=False),
+                resizable=True  # We need this to resize with the parent widget
+                )
+
+
+################################################################################
+# The QWidget containing the visualization, this is pure PyQt4 code.
+class MayaviQWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        QtWidgets.QWidget.__init__(self, parent)
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        self.visualization = Visualization()
+
+        # If you want to debug, beware that you need to remove the Qt
+        # input hook.
+        # QtCore.pyqtRemoveInputHook()
+        # import pdb ; pdb.set_trace()
+        # QtCore.pyqtRestoreInputHook()
+
+        # The edit_traits call will generate the widget to embed.
+
+        #self.ui = self.visualization.edit_traits(parent=self,kind='subpanel').control
+        #layout.addWidget(self.ui)
+        #self.setParent(self.ui)
 
 
 class MyWidget(QtWidgets.QWidget):
@@ -63,13 +116,18 @@ class MyWidget(QtWidgets.QWidget):
         vertical_layout_2.addWidget(QLabel("", self), alignment=QtCore.Qt.AlignCenter)
         vertical_layout_2.addWidget(self.result_label, alignment=QtCore.Qt.AlignCenter)
 
+        vertical_layout_3 = QVBoxLayout()
+        container = QtWidgets.QWidget()
+        mayavi_widget = MayaviQWidget(container)
+        vertical_layout_2.addWidget(mayavi_widget, alignment=QtCore.Qt.AlignCenter)
+
         horizontal_layout_1.addLayout(vertical_layout_1)
         horizontal_layout_1.addLayout(vertical_layout_2)
+        horizontal_layout_1.addLayout(vertical_layout_3)
 
         # Set the layout on the application's window
         self.setLayout(horizontal_layout_1)
 
-    @QtCore.Slot()
     def select_stl(self):
         global stl_path
         root = tk.Tk()
@@ -84,15 +142,13 @@ class MyWidget(QtWidgets.QWidget):
             self.stl_label.setText(stl_path)
 
     # stl model gösterme
-    @QtCore.Slot()
     def show_stl(self):
         mesh = Mesh.from_file(stl_path)
-        fig = vpl.figure()
-        mesh = vpl.mesh_plot(mesh)
-        vpl.show()
+        vtk.figure()
+        vtk.mesh_plot(mesh)
+        vtk.show()
 
     # stl to binvox convert
-    @QtCore.Slot()
     def convert_binvox(self):
         global copied_stl_path
         global stl_path
@@ -108,25 +164,22 @@ class MyWidget(QtWidgets.QWidget):
         self.predict_btn.setEnabled(True)
 
     # binvox model görüntüleme
-    @QtCore.Slot()
     def show_binvox(self):
         with open("./out/input.binvox", 'rb') as f:
             model = binvox_rw.read_as_3d_array(f)
 
-        from mayavi import mlab
-
         xx, yy, zz = np.where(model.data == 1)
-
         mlab.points3d(xx, yy, zz, mode="cube", color=(0, 1, 0), scale_factor=1)
 
         mlab.show()
 
     # predict
-    @QtCore.Slot()
     def predict_out(self):
+        print()
         a = predict().predict_mpi()
         self.result_label.setText(str(a))
         b = predict().predict_mach()
+
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, widget):
@@ -135,17 +188,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # menu
         self.menu = self.menuBar()
-        self.file_menu = self.menu.addMenu("File")
-
-        # exit Qaction
-        exit_action = QtGui.QAction("Exit", self)
-        exit_action.setShortcut("Ctrl+Q")
-        exit_action.triggered.connect(self.exit_app)
-
-        self.file_menu.addAction(exit_action)
         self.setCentralWidget(widget)
 
-    @QtCore.Slot()
     def exit_app(self, checked):
         QtWidgets.QApplication.quit()
 
