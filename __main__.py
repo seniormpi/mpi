@@ -80,30 +80,22 @@ class MyWidget(QtWidgets.QWidget):
         QtWidgets.QWidget.__init__(self)
         self.items = 0
         self.select_stl_btn = QtWidgets.QPushButton("Select Stl Model")
-        self.view_stl_btn = QtWidgets.QPushButton("View Stl Model")
         self.convert_stl_to_binvox_btn = QtWidgets.QPushButton("Convert to Binvox")
-        self.view_binvox_btn = QtWidgets.QPushButton("View Binvox Model")
         self.predict_btn = QtWidgets.QPushButton("Predict model")
 
         # default disabled buttons
-        self.view_stl_btn.setEnabled(False)
         self.convert_stl_to_binvox_btn.setEnabled(False)
-        self.view_binvox_btn.setEnabled(False)
         self.predict_btn.setEnabled(False)
 
         self.select_stl_btn.clicked.connect(self.select_stl)
-        self.view_stl_btn.clicked.connect(self.show_stl)
         self.convert_stl_to_binvox_btn.clicked.connect(self.convert_binvox)
-        self.view_binvox_btn.clicked.connect(self.show_binvox)
         self.predict_btn.clicked.connect(self.predict_out)
 
         horizontal_layout_1 = QHBoxLayout()
 
         vertical_layout_1 = QVBoxLayout()
         vertical_layout_1.addWidget(self.select_stl_btn)
-        vertical_layout_1.addWidget(self.view_stl_btn)
         vertical_layout_1.addWidget(self.convert_stl_to_binvox_btn)
-        vertical_layout_1.addWidget(self.view_binvox_btn)
         vertical_layout_1.addWidget(self.predict_btn)
 
         self.stl_label = QLabel("Please select a STL file", self)
@@ -137,10 +129,9 @@ class MyWidget(QtWidgets.QWidget):
 
         # enable next step buttons
         if stl_path.endswith('.stl'):
-            self.view_stl_btn.setEnabled(True)
             self.convert_stl_to_binvox_btn.setEnabled(True)
             self.stl_label.setText(stl_path)
-
+        self.show_stl()
     # stl model gösterme
     def show_stl(self):
         mesh = Mesh.from_file(stl_path)
@@ -160,9 +151,8 @@ class MyWidget(QtWidgets.QWidget):
         subprocess.call(['.\\executables\\binvox.exe', '-c', '-d', '64', copied_stl_path])
 
         # enable next step buttons
-        self.view_binvox_btn.setEnabled(True)
         self.predict_btn.setEnabled(True)
-
+        self.show_binvox()
     # binvox model görüntüleme
     def show_binvox(self):
         with open("./out/input.binvox", 'rb') as f:
