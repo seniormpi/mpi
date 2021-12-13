@@ -19,22 +19,6 @@ from traitsui.api import View, Item
 
 copied_stl_path = ".\\out\\input.stl"
 
-
-################################################################################
-# The actual visualization
-class VisualizationSTL(HasTraits):
-    scene = Instance(MlabSceneModel, ())
-
-    @on_trait_change('scene.activated')
-    def update_plot(self):
-        stlMesh = Mesh.from_file(copied_stl_path)
-        mlab.mesh(stlMesh)
-
-    # the layout of the dialog screated
-    view = View(Item('scene', editor=SceneEditor(scene_class=MayaviScene),
-                     height=250, width=300, show_label=False),
-                resizable=True  # We need this to resize with the parent widget
-                )
 # The actual visualization
 class VisualizationBinvox(HasTraits):
     scene = Instance(MlabSceneModel, ())
@@ -59,17 +43,6 @@ class VisualizationBinvox(HasTraits):
                 resizable=True  # We need this to resize with the parent widget
                 )
 
-class STLWidget(QtWidgets.QWidget):
-    def __init__(self, parent=None):
-        QtWidgets.QWidget.__init__(self, parent)
-        layout = QtWidgets.QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-        self.visualization = VisualizationSTL()
-
-        self.ui = self.visualization.edit_traits(parent=self, kind='subpanel').control
-        layout.addWidget(self.ui)
-        self.ui.setParent(self)
 ################################################################################
 class BinvoxWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
