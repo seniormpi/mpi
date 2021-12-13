@@ -20,7 +20,7 @@ from mayavi.core.ui.api import MayaviScene, MlabSceneModel, \
 from traits.api import HasTraits, Instance, on_trait_change
 from traitsui.api import View, Item
 
-from predict import predict
+#from predict import predict
 
 copied_stl_path = ".\\out\\input.stl"
 
@@ -69,9 +69,9 @@ class MayaviQWidget(QtWidgets.QWidget):
 
         # The edit_traits call will generate the widget to embed.
 
-        #self.ui = self.visualization.edit_traits(parent=self,kind='subpanel').control
-        #layout.addWidget(self.ui)
-        #self.setParent(self.ui)
+        self.ui = self.visualization.edit_traits(parent=self, kind='subpanel').control
+        layout.addWidget(self.ui)
+        self.ui.setParent(self)
 
 
 class MyWidget(QtWidgets.QWidget):
@@ -176,9 +176,9 @@ class MyWidget(QtWidgets.QWidget):
     # predict
     def predict_out(self):
         print()
-        a = predict().predict_mpi()
-        self.result_label.setText(str(a))
-        b = predict().predict_mach()
+        #a = predict().predict_mpi()
+        #self.result_label.setText(str(a))
+        #b = predict().predict_mach()
 
 
 class MainWindow(QtWidgets.QMainWindow):
