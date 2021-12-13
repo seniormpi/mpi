@@ -3,7 +3,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel
 import numpy as np
 import binvox_rw
-import vtkplotlib as vtk
+import vtkplotlib as vpl
 from stl.mesh import Mesh
 import tkinter as tk
 from tkinter import filedialog
@@ -127,8 +127,8 @@ class MyWidget(QtWidgets.QWidget):
 
         vertical_layout_3 = QVBoxLayout()
         container = QtWidgets.QWidget()
-        stl_widget = STLWidget(container)
-        vertical_layout_3.addWidget(stl_widget)
+        self.stl_widget = vpl.QtFigure()
+        vertical_layout_3.addWidget(self.stl_widget)
         binvox_widget = BinvoxWidget(container)
         vertical_layout_3.addWidget(binvox_widget)
 
@@ -155,9 +155,8 @@ class MyWidget(QtWidgets.QWidget):
     # stl model gösterme
     def show_stl(self):
         mesh = Mesh.from_file(stl_path)
-        vtk.figure()
-        vtk.mesh_plot(mesh)
-        vtk.show()
+        vpl.mesh_plot(mesh, fig=self.stl_widget)
+        self.stl_widget.show()
 
     # stl to binvox convert
     def convert_binvox(self):
