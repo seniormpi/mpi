@@ -127,6 +127,8 @@ class MyWidget(QtWidgets.QWidget):
 
         vertical_layout_3 = QVBoxLayout()
         container = QtWidgets.QWidget()
+        stl_widget = STLWidget(container)
+        vertical_layout_3.addWidget(stl_widget)
         binvox_widget = BinvoxWidget(container)
         vertical_layout_3.addWidget(binvox_widget)
 
