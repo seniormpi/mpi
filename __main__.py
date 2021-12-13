@@ -27,7 +27,6 @@ class VisualizationBinvox(HasTraits):
     def update_plot(self):
         # This function is called when the view is opened. We don't
         # populate the scene when the view is not yet open, as some
-        # VTK features require a GLContext.
 
         # We can do normal mlab calls on the embedded scene.
         with open("./out/input.binvox", 'rb') as f:
@@ -98,16 +97,14 @@ class MyWidget(QtWidgets.QWidget):
         vertical_layout_2.addWidget(QLabel("", self), alignment=QtCore.Qt.AlignCenter)
         vertical_layout_2.addWidget(self.result_label, alignment=QtCore.Qt.AlignCenter)
 
-        vertical_layout_3 = QVBoxLayout()
-        container = QtWidgets.QWidget()
+        self.vertical_layout_3 = QVBoxLayout()
         self.stl_widget = vpl.QtFigure()
-        vertical_layout_3.addWidget(self.stl_widget)
-        binvox_widget = BinvoxWidget(container)
-        vertical_layout_3.addWidget(binvox_widget)
+        self.vertical_layout_3.addWidget(self.stl_widget)
+
 
         horizontal_layout_1.addLayout(vertical_layout_1)
         horizontal_layout_1.addLayout(vertical_layout_2)
-        horizontal_layout_1.addLayout(vertical_layout_3)
+        horizontal_layout_1.addLayout(self.vertical_layout_3)
 
         # Set the layout on the application's window
         self.setLayout(horizontal_layout_1)
@@ -148,7 +145,8 @@ class MyWidget(QtWidgets.QWidget):
 
     # binvox model görüntüleme
     def show_binvox(self):
-        print()
+        container = QtWidgets.QWidget()
+        self.vertical_layout_3.addWidget(BinvoxWidget(container))
 
     # predict
     def predict_out(self):
