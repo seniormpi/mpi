@@ -1,10 +1,7 @@
-import random
 import sys
-from threading import local
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel
 import numpy as np
-import pandas as pd
 import binvox_rw
 import vtkplotlib as vtk
 from stl.mesh import Mesh
@@ -12,8 +9,6 @@ import tkinter as tk
 from tkinter import filedialog
 import subprocess
 from shutil import copyfile
-import os
-
 from mayavi import mlab
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, \
     SceneEditor
@@ -27,7 +22,21 @@ copied_stl_path = ".\\out\\input.stl"
 
 ################################################################################
 # The actual visualization
-class Visualization(HasTraits):
+class VisualizationSTL(HasTraits):
+    scene = Instance(MlabSceneModel, ())
+
+    @on_trait_change('scene.activated')
+    def update_plot(self):
+        stlMesh = Mesh.from_file(copied_stl_path)
+        mlab.mesh(stlMesh)
+
+    # the layout of the dialog screated
+    view = View(Item('scene', editor=SceneEditor(scene_class=MayaviScene),
+                     height=250, width=300, show_label=False),
+                resizable=True  # We need this to resize with the parent widget
+                )
+# The actual visualization
+class VisualizationBinvox(HasTraits):
     scene = Instance(MlabSceneModel, ())
 
     @on_trait_change('scene.activated')
@@ -50,19 +59,27 @@ class Visualization(HasTraits):
                 resizable=True  # We need this to resize with the parent widget
                 )
 
-
-################################################################################
-# The QWidget containing the visualization, this is pure PyQt4 code.
-class MayaviQWidget(QtWidgets.QWidget):
+class STLWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self, parent)
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        self.visualization = Visualization()
+        self.visualization = VisualizationSTL()
 
-        # If you want to debug, beware that you need to remove the Qt
-        # input hook.
+        self.ui = self.visualization.edit_traits(parent=self, kind='subpanel').control
+        layout.addWidget(self.ui)
+        self.ui.setParent(self)
+################################################################################
+class BinvoxWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        QtWidgets.QWidget.__init__(self, parent)
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        self.visualization = VisualizationBinvox()
+
+        # If you want to debug, beware that you need to remove the Qt input hook.
         # QtCore.pyqtRemoveInputHook()
         # import pdb ; pdb.set_trace()
         # QtCore.pyqtRestoreInputHook()
@@ -110,8 +127,8 @@ class MyWidget(QtWidgets.QWidget):
 
         vertical_layout_3 = QVBoxLayout()
         container = QtWidgets.QWidget()
-        mayavi_widget = MayaviQWidget(container)
-        vertical_layout_2.addWidget(mayavi_widget, alignment=QtCore.Qt.AlignCenter)
+        binvox_widget = BinvoxWidget(container)
+        vertical_layout_3.addWidget(binvox_widget)
 
         horizontal_layout_1.addLayout(vertical_layout_1)
         horizontal_layout_1.addLayout(vertical_layout_2)
@@ -131,7 +148,8 @@ class MyWidget(QtWidgets.QWidget):
         if stl_path.endswith('.stl'):
             self.convert_stl_to_binvox_btn.setEnabled(True)
             self.stl_label.setText(stl_path)
-        self.show_stl()
+            self.show_stl()
+
     # stl model gösterme
     def show_stl(self):
         mesh = Mesh.from_file(stl_path)
@@ -153,15 +171,10 @@ class MyWidget(QtWidgets.QWidget):
         # enable next step buttons
         self.predict_btn.setEnabled(True)
         self.show_binvox()
+
     # binvox model görüntüleme
     def show_binvox(self):
-        with open("./out/input.binvox", 'rb') as f:
-            model = binvox_rw.read_as_3d_array(f)
-
-        xx, yy, zz = np.where(model.data == 1)
-        mlab.points3d(xx, yy, zz, mode="cube", color=(0, 1, 0), scale_factor=1)
-
-        mlab.show()
+        print()
 
     # predict
     def predict_out(self):
