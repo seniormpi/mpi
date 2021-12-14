@@ -15,7 +15,7 @@ from mayavi.core.ui.api import MayaviScene, MlabSceneModel, \
 from traits.api import HasTraits, Instance, on_trait_change
 from traitsui.api import View, Item
 
-#from predict import predict
+from predict import predict
 
 copied_stl_path = ".\\out\\input.stl"
 
@@ -88,14 +88,20 @@ class MyWidget(QtWidgets.QWidget):
         vertical_layout_1.addWidget(self.predict_btn)
 
         self.stl_label = QLabel("Please select a STL file", self)
-        self.result_label = QLabel("The result will be here.", self)
+        self.res_label = QLabel("Results: ", self)
+        self.result_label = QLabel(" ", self)
+        self.result_label2 = QLabel(" ", self)
+        
 
         vertical_layout_2 = QVBoxLayout()
         vertical_layout_2.addWidget(QLabel(""), alignment=QtCore.Qt.AlignCenter)
         vertical_layout_2.addWidget(self.stl_label, alignment=QtCore.Qt.AlignCenter)
         vertical_layout_2.addWidget(QLabel("", self), alignment=QtCore.Qt.AlignCenter)
         vertical_layout_2.addWidget(QLabel("", self), alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_2.addWidget(self.res_label, alignment=QtCore.Qt.AlignCenter)
         vertical_layout_2.addWidget(self.result_label, alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_2.addWidget(self.result_label2, alignment=QtCore.Qt.AlignCenter)
+        
 
         self.vertical_layout_3 = QVBoxLayout()
         self.stl_widget = vpl.QtFigure()
@@ -151,9 +157,13 @@ class MyWidget(QtWidgets.QWidget):
     # predict
     def predict_out(self):
         print()
-        #a = predict().predict_mpi()
-        #self.result_label.setText(str(a))
-        #b = predict().predict_mach()
+        a = "The procedure: "
+        a += predict().predict_mpi()
+        self.result_label2.setText(a)
+        b = "The Machinability: "
+        b += predict().predict_mach()
+        self.result_label.setText(b)
+        print(b)
 
 
 class MainWindow(QtWidgets.QMainWindow):

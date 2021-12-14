@@ -62,13 +62,18 @@ class predict():
         batch_x = np.array(batch_input)
         
         result = self.model.predict(batch_x)
-        result[:,0][result[:,0] >= 0.5] = 1
-        result[:,1][result[:,1] >= 0.5] = 1
-        result[:,1][result[:,1] < 0.5] = 0
-        result[:,0][result[:,0] < 0.5] = 0
-        print("Classification Results", result)
+        res = ""
+        if (result[:,0][result[:,0] >= 0.5]): #= 1
+            res += "Milling "
+        if (result[:,1][result[:,1] >= 0.5]): # = 1
+            res += "Turning "
+        if (result[:,1][result[:,1] < 0.5]): # = 0
+            res += " "
+        if (result[:,0][result[:,0] < 0.5]): # = 0
+            res += " "
+        print("Classification Results", res)
         
-        return result
+        return res
         
         
     def predict_mach(self):
@@ -81,10 +86,8 @@ class predict():
         batch_x = np.array(batch_input)
         
         result = self.model2.predict(batch_x)
-        result[:][result[:] <0.5] = 0
-        result[:][result[:] >=0.5] = 1
-        
-        print("Machinability Results", result)
-        
-        return result
+        if (result[:][result[:] <0.5]):
+            return "not machinable"
+        if (result[:][result[:] >=0.5]):
+            return "machinable"
         
