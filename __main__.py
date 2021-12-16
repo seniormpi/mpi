@@ -91,25 +91,27 @@ class MyWidget(QtWidgets.QWidget):
         self.res_label = QLabel("Results: ", self)
         self.result_label = QLabel(" ", self)
         self.result_label2 = QLabel(" ", self)
-        
 
-        vertical_layout_2 = QVBoxLayout()
-        vertical_layout_2.addWidget(QLabel(""), alignment=QtCore.Qt.AlignCenter)
-        vertical_layout_2.addWidget(self.stl_label, alignment=QtCore.Qt.AlignTop)
-        vertical_layout_2.addWidget(QLabel("", self), alignment=QtCore.Qt.AlignCenter)
-        vertical_layout_2.addWidget(QLabel("", self), alignment=QtCore.Qt.AlignCenter)
-        vertical_layout_2.addWidget(self.res_label, alignment=QtCore.Qt.AlignCenter)
-        vertical_layout_2.addWidget(self.result_label, alignment=QtCore.Qt.AlignCenter)
-        vertical_layout_2.addWidget(self.result_label2, alignment=QtCore.Qt.AlignCenter)
-        
+
+
 
         self.vertical_layout_3 = QVBoxLayout()
+
+        self.vertical_layout_3.addWidget(self.stl_label, alignment=QtCore.Qt.AlignTop)
+        vertical_layout_1.addWidget(QLabel("", self), alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_1.addWidget(QLabel("", self), alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_1.addWidget(self.res_label, alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_1.addWidget(self.result_label, alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_1.addWidget(self.result_label2, alignment=QtCore.Qt.AlignCenter)
+        
+
         self.stl_widget = vpl.QtFigure()
         self.vertical_layout_3.addWidget(self.stl_widget)
 
 
+
         horizontal_layout_1.addLayout(vertical_layout_1)
-        horizontal_layout_1.addLayout(vertical_layout_2)
+        horizontal_layout_1.addLayout(vertical_layout_1)
         horizontal_layout_1.addLayout(self.vertical_layout_3)
 
         # Set the layout on the application's window
