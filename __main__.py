@@ -95,7 +95,7 @@ class MyWidget(QtWidgets.QWidget):
 
         vertical_layout_2 = QVBoxLayout()
         vertical_layout_2.addWidget(QLabel(""), alignment=QtCore.Qt.AlignCenter)
-        vertical_layout_2.addWidget(self.stl_label, alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_2.addWidget(self.stl_label, alignment=QtCore.Qt.AlignTop)
         vertical_layout_2.addWidget(QLabel("", self), alignment=QtCore.Qt.AlignCenter)
         vertical_layout_2.addWidget(QLabel("", self), alignment=QtCore.Qt.AlignCenter)
         vertical_layout_2.addWidget(self.res_label, alignment=QtCore.Qt.AlignCenter)
