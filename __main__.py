@@ -19,6 +19,7 @@ from predict import predict
 
 copied_stl_path = ".\\out\\input.stl"
 
+
 # The actual visualization
 class VisualizationBinvox(HasTraits):
     scene = Instance(MlabSceneModel, ())
@@ -34,13 +35,14 @@ class VisualizationBinvox(HasTraits):
 
         xx, yy, zz = np.where(model.data == 1)
         self.scene.mlab.points3d(xx, yy, zz, mode="cube", color=(0, 1, 0), scale_factor=1)
-        #self.scene.mlab.test_points3d()
+        # self.scene.mlab.test_points3d()
 
     # the layout of the dialog screated
     view = View(Item('scene', editor=SceneEditor(scene_class=MayaviScene),
                      height=250, width=300, show_label=False),
                 resizable=True  # We need this to resize with the parent widget
                 )
+
 
 ################################################################################
 class BinvoxWidget(QtWidgets.QWidget):
@@ -92,9 +94,6 @@ class MyWidget(QtWidgets.QWidget):
         self.result_label = QLabel(" ", self)
         self.result_label2 = QLabel(" ", self)
 
-
-
-
         self.vertical_layout_3 = QVBoxLayout()
 
         self.vertical_layout_3.addWidget(self.stl_label, alignment=QtCore.Qt.AlignTop)
@@ -103,14 +102,10 @@ class MyWidget(QtWidgets.QWidget):
         vertical_layout_1.addWidget(self.res_label, alignment=QtCore.Qt.AlignCenter)
         vertical_layout_1.addWidget(self.result_label, alignment=QtCore.Qt.AlignCenter)
         vertical_layout_1.addWidget(self.result_label2, alignment=QtCore.Qt.AlignCenter)
-        
 
         self.stl_widget = vpl.QtFigure()
         self.vertical_layout_3.addWidget(self.stl_widget)
 
-
-
-        horizontal_layout_1.addLayout(vertical_layout_1)
         horizontal_layout_1.addLayout(vertical_layout_1)
         horizontal_layout_1.addLayout(self.vertical_layout_3)
 
