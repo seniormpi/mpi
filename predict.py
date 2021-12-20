@@ -1,28 +1,8 @@
-import random
-import sys
-from threading import local
-from PySide6 import QtCore, QtWidgets, QtGui
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel
-import numpy as np
-import pandas as pd
 import binvox_rw
-import vtkplotlib as vpl
-from stl.mesh import Mesh
-import tkinter as tk
-from tkinter import filedialog
-import subprocess
-from shutil import copyfile
-import os
 import numpy as np
-import tensorflow
 import keras
-from keras import regularizers
-import os
-import random
-from keras.layers import Input, MaxPooling3D, MaxPooling2D, Dense, Flatten, BatchNormalization, Dropout
+from keras.layers import MaxPooling3D, Dense, Flatten
 from keras.layers.convolutional import Conv3D
-from keras.models import Model
-from keras import optimizers
 from keras import regularizers
 
 class predict():
