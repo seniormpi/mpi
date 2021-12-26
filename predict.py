@@ -6,6 +6,7 @@ from keras.layers.convolutional import Conv3D
 from keras import regularizers
 from math import log2, inf
 
+
 class predict():
     model = keras.models.Sequential()
     model.add(Conv3D(32, 7, strides=2, padding='valid', activation='relu', input_shape=(64, 64, 64, 1)))
@@ -98,6 +99,11 @@ class predict():
         model_input = np.reshape(data, (64, 64, 64, 1))
         batch_input += [model_input]
         batch_x = np.array(batch_input)
+
+        feature_extractor = keras.Model(
+            inputs=self.model.inputs,
+            outputs=[layer.output for layer in self.model.layers],
+        )
 
         result = self.model.predict(batch_x)
         res = ""

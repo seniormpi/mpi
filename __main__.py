@@ -19,6 +19,7 @@ from predict import predict
 
 copied_stl_path = ".\\out\\input.stl"
 
+shown_binvox = 0
 
 # The actual visualization
 class VisualizationBinvox(HasTraits):
@@ -148,8 +149,14 @@ class MyWidget(QtWidgets.QWidget):
 
     # binvox model görüntüleme
     def show_binvox(self):
+        global shown_binvox
         container = QtWidgets.QWidget()
+        if shown_binvox:
+            for i in reversed(range(self.vertical_layout_3.count())):
+                self.vertical_layout_3.itemAt(i).widget().setParent(None)
+                self.vertical_layout_3.addWidget(self.stl_widget)
         self.vertical_layout_3.addWidget(BinvoxWidget(container))
+        shown_binvox = 1
 
     # predict
     def predict_out(self):
