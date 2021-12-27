@@ -173,14 +173,14 @@ class MyWidget(QtWidgets.QWidget):
     # predict
     def predict_out(self):
         print()
-        a = "The procedure: "
-        a += predict().predict_mpi()
-        self.result_label2.setText(a)
         b = "The Machinability: "
         b += predict().predict_mach()
-        self.result_label.setText(b)
         print(b)
-
+        self.result_label.setText(b)
+        if(b == "The Machinability: machinable"):
+            a = "The procedure: "
+            a += predict().predict_mpi()
+            self.result_label2.setText(a)
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, widget):
