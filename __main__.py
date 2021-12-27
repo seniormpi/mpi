@@ -20,6 +20,7 @@ from predict import predict
 copied_stl_path = ".\\out\\input.stl"
 
 shown_binvox = 0
+shown_stl = 0
 
 # The actual visualization
 class VisualizationBinvox(HasTraits):
@@ -128,9 +129,20 @@ class MyWidget(QtWidgets.QWidget):
 
     # stl model gösterme
     def show_stl(self):
+        global shown_stl
+        if shown_stl:
+            for i in reversed(range(self.vertical_layout_3.count())):
+                self.vertical_layout_3.itemAt(i).widget().setParent(None)
+            self.stl_widget = vpl.QtFigure()
+            self.vertical_layout_3.addWidget(self.stl_widget)
+            self.result_label2.setText("")
+            self.result_label.setText("")
+
         mesh = Mesh.from_file(stl_path)
         vpl.mesh_plot(mesh, fig=self.stl_widget)
         self.stl_widget.show()
+
+        shown_stl = 1
 
     # stl to binvox convert
     def convert_binvox(self):
