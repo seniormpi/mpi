@@ -1,10 +1,13 @@
 import binvox_rw
 import numpy as np
 import keras
+import tensorflow
 from keras.layers import MaxPooling3D, Dense, Flatten
 from keras.layers.convolutional import Conv3D
 from keras import regularizers
 from math import log2, inf
+import pickle
+import shap
 
 
 class predict():
@@ -93,6 +96,10 @@ class predict():
 
     def predict_mpi(self):
         # predict of real parts with model 2
+        
+        with open('process_data.pickle', 'rb') as f:
+            x_train = pickle.load(f)
+        
         batch_input = []
         with open("./out/input.binvox", 'rb') as file:
             data = np.int32(binvox_rw.read_as_3d_array(file).data)
@@ -105,6 +112,10 @@ class predict():
             outputs=[layer.output for layer in self.model.layers],
         )
 
+        # compute SHAP values
+        explainer = shap.DeepExplainer(model, x_train)
+        shap_values = explainer.shap_values(batch_x)
+        
         result = self.model.predict(batch_x)
         res = ""
         if (result[:, 0][result[:, 0] >= 0.5]):  # = 1
