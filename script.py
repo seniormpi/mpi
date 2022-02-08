@@ -38,6 +38,7 @@ def data_process(dataframe, num_features=21):
     validate = []
     train = []
     test = []
+    print(dataframe)
     for f in range(num_features):
         array1 = dataframe['model'].tolist()[(f * 1200):((f + 1) * 1200)]
         array2 = [s + '.binvox' for s in array1]
