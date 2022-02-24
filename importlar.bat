@@ -14,3 +14,9 @@ pip install tensorflow
 pip install pandas
 pip install livelossplot
 pip install tikzplotlib
+pip install keras
+pip install tensorflow
+pip install pandas
+pip install livelossplot
+pip install tikzplotlib
+pip install shap

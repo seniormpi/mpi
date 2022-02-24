@@ -21,7 +21,11 @@ class predict():
     model.add(Dense(128, activation='relu', kernel_regularizer=regularizers.l2(0.0)))
     model.add(Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.0)))
     model.add(Dense(2, activation='sigmoid'))
-    model.load_weights('models/model_mpi.h5')
+    modded = true
+    if modded:
+        model.load_weights('models/model_mpi_mod.h5')
+    else:
+        model.load_weights('models/model_mpi.h5')
 
     model2 = keras.models.Sequential()
     model2.add(Conv3D(32, 7, strides=2, padding='valid', activation='relu', input_shape=(64, 64, 64, 1)))
@@ -33,7 +37,12 @@ class predict():
     model2.add(Dense(128, activation='relu', kernel_regularizer=regularizers.l2(0.0)))
     model2.add(Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.0)))
     model2.add(Dense(1, activation='sigmoid'))
-    model2.load_weights('models/model_classify_mach_non_mach.h5')
+
+
+    if modded:
+        model2.load_weights('models/model_classify_mach_non_mach_mod.h5')
+    else:
+        model2.load_weights('models/model_classify_mach_non_mach.h5')
 
     # calculta mutual information
     def compute_mi(feature_col, label_col):
@@ -96,7 +105,7 @@ class predict():
 
     def predict_mpi(self):
         # predict of real parts with model 2
-        
+
         with open('process_data.pickle', 'rb') as f:
             x_train = pickle.load(f)
         
@@ -106,11 +115,6 @@ class predict():
         model_input = np.reshape(data, (64, 64, 64, 1))
         batch_input += [model_input]
         batch_x = np.array(batch_input)
-
-        feature_extractor = keras.Model(
-            inputs=self.model.inputs,
-            outputs=[layer.output for layer in self.model.layers],
-        )
 
         # compute SHAP values
         #explainer = shap.DeepExplainer(model, x_train)
