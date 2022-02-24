@@ -17,9 +17,9 @@ import tikzplotlib
 import binvox_rw
 import os
 import pickle
+import shap
 
 # Part - 1 : Feature Classification
-
 def make_labels():
     cols = ['model', 'Feature']
     lst = []
@@ -80,14 +80,50 @@ def model_generator(data_dir, index_list, dataframe, mode, batch_size=32):
         batch_x = np.array(batch_input)
         batch_y = np.array(batch_output)
         yield (batch_x, batch_y)
+        
+def model_generator_xtrain(data_dir, index_list, dataframe, mode, batch_size=32):
+    np.random.seed(123)
+    one_hot = np.identity(21)
+    global Y_true
+    counter = 0
+    while True:
+        batch_paths = np.random.choice(a=index_list, size=batch_size)
+        batch_input = []
+        batch_output = []
+        for input_path in batch_paths:
+            file_path = os.path.join(data_dir, input_path)
+            with open(file_path, 'rb') as file:
+                data = np.int32(binvox_rw.read_as_3d_array(file).data)
+            model_input = np.reshape(data, (64, 64, 64, 1))
+            index_num = int(input_path.split('_')[0])
+            label = one_hot[index_num - 1, :]
+            model_output = label.tolist()
+
+            batch_input += [model_input]
+            batch_output += [model_output]
+
+        batch_x = np.array(batch_input)
+        batch_y = np.array(batch_output)
+
+        if (mode == 'test'):
+            Y_true += batch_output
+        batch_x = np.array(batch_input)
+        batch_y = np.array(batch_output)
+        return (batch_x, batch_y)
 
 data_dir = '.\\data\\feature_data'
 
 df = make_labels()
 partition = data_process(df)
 Y_true = []
+(x_train, y_train) = model_generator_xtrain(data_dir, partition['train'], df, 'train')
+(x_test, y_test) = model_generator_xtrain(data_dir, partition['test'], df, 'test')
+
+x_train = x_train[0:100]
+x_test = x_test[0:10]
+
 training_generator = model_generator(data_dir, partition['train'], df, 'train')
-validation_generator = model_generator(data_dir, partition['validate'], df, 'val')
+validation_generator = model_generator(data_dir, partition['validate'], df, 'validate')
 test_generator = model_generator(data_dir, partition['test'], df, 'test')
 
 from livelossplot import PlotLossesKeras
@@ -113,22 +149,21 @@ model.compile(loss='categorical_crossentropy',
 
 model.summary()
 
-(x_train, y_train) =  training_generator
-with open('feature_data.pickle', 'wb') as f:
-    pickle.dump(x_train, f)
-
-
-history1 = model.fit_generator(generator=training_generator,
+history1 = model.fit_generator(training_generator,
                                steps_per_epoch=5,
                                validation_data=validation_generator,
                                validation_steps=5,
-                               epochs=1000)
+                               epochs=10)
+
+#background = x_train[np.random.choice(x_train.shape[0], 100, replace=True)]
+#explainer = shap.DeepExplainer(model, background)
+#shap_values = explainer.shap_values(x_test[1:10])
+#shap.image_plot(shap_values, -x_test[1:10])
 
 # Saving all Models and Accuracies
 model.save_weights('model_features.h5')
 
-# accuracy
-
+"""# accuracy
 acc = []
 val_acc = []
 loss = []
@@ -194,7 +229,7 @@ df_cm = pd.DataFrame(cm, index=[i for i in lbl],
 plt.figure(figsize=(10, 7))
 cn_heat = sns.heatmap(df_cm, annot=True, cmap='Blues')
 fig = cn_heat.get_figure()
-fig.savefig('part1_conf_mat_features.png')
+fig.savefig('part1_conf_mat_features.png')"""
 
 # Part 2 : Machining Process Recognition
 
@@ -309,10 +344,6 @@ model1.compile(loss='binary_crossentropy',
                optimizer=tensorflow.keras.optimizers.Adam(lr=learning_rate, decay=decay_rate),
                metrics=['accuracy'])
 
-(x_train, y_train) =  training_generator
-with open('process_data.pickle', 'wb') as f:
-    pickle.dump(x_train, f)
-
 model1.summary()
 
 history = model1.fit_generator(generator=training_generator,
@@ -322,11 +353,11 @@ history = model1.fit_generator(generator=training_generator,
                                epochs=500)
 
 model1.save_weights("model_mpi.h5")
-score, acc = model1.evaluate_generator(test_generator, steps=10)
-print(acc)
+#score, acc = model1.evaluate_generator(test_generator, steps=10)
+#print(acc)
 
+"""
 # Accuracy
-
 acc = []
 val_acc = []
 loss = []
@@ -360,9 +391,9 @@ plt.plot(y, val_loss, linewidth=0.8)
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
 plt.legend(['Training', 'Validation'], loc='upper right')
-plt.savefig('loss_mpi.png')
+plt.savefig('loss_mpi.png')"""
 
-# Machining Process Recognition of Real Parts
+"""# Machining Process Recognition of Real Parts
 
 def model_generator(data_dir, index_list):
     global Y_true
@@ -381,17 +412,10 @@ def model_generator(data_dir, index_list):
                     print(file)
             model_input = np.reshape(data, (64, 64, 64, 1))
             data2 = input_path.replace('.binvox', '')
-            # label = dataframe.loc[dataframe['model'] == data2, ['Milling','Turning']]
-            # model_output = label.values.tolist()[0]
-
             batch_input += [model_input]
-            # batch_output += [model_output]
 
         batch_x = np.array(batch_input)
-        # batch_y = np.array(batch_output)
-
         return (batch_x)
-
 
 def make_labels():
     cols = ['model']
@@ -403,7 +427,6 @@ def make_labels():
     df = df1
     return df
 
-
 def data_process(dataframe):
     # process the batch data
     validate = []
@@ -411,15 +434,12 @@ def data_process(dataframe):
     test = []
     for f in range(1):
         array1 = dataframe['model'].tolist()[(f * 43):((f + 1) * 43)]
-        # print(array1[0])
         array2 = [s + '.binvox' for s in array1]
-        # print(array2[0])
         random.shuffle(array2)
         train = train + array2[0:43]
 
     partition = {'train': train}
     return partition
-
 
 data_dir = '.\data\fin_data'
 df = make_labels()
@@ -428,12 +448,17 @@ partition = data_process(df)
 Y_true = []
 train_generator = model_generator(data_dir, partition['train'])
 
+#(x_test_real, y_test_real) = train_generator
+
+#explainer = shap.DeepExplainer(model1, x_train)
+#shap_values = explainer.shap_values(x_test_real)
+
 result = model1.predict(train_generator)
 result[:, 0][result[:, 0] >= 0.5] = 1
 result[:, 1][result[:, 1] >= 0.5] = 1
 result[:, 1][result[:, 1] < 0.5] = 0
 result[:, 0][result[:, 0] < 0.5] = 0
-print(result, "Classification Results")
+print(result, "Classification Results")"""
 
 # Part 3 : Machinability classification of Synthetic Parts
 
@@ -458,7 +483,6 @@ def make_labels():
     df1 = pd.DataFrame(lst, columns=cols)
     df = df1
     return df
-
 
 def data_process(dataframe):
     # process the batch data
@@ -491,7 +515,6 @@ def data_process(dataframe):
 
     partition = {'train': train, 'validate': validate, 'test': test}
     return partition
-
 
 def model_generator(data_dir, index_list, dataframe, mode, batch_size=32):
     global Y_true
@@ -528,6 +551,10 @@ df = make_labels()
 partition = data_process(df)
 
 Y_true = []
+"""(x_train, y_train) = model_generator(data_dir, partition['train'], df, 'train')
+(x_val, y_val) = model_generator(data_dir, partition['validate'], df, 'validate')
+(x_test, y_test) = model_generator(data_dir, partition['test'], df, 'test')"""
+
 training_generator = model_generator(data_dir, partition['train'], df, 'train')
 validation_generator = model_generator(data_dir, partition['validate'], df, 'validate')
 test_generator = model_generator(data_dir, partition['test'], df, 'test')
@@ -573,9 +600,10 @@ model1.compile(loss='binary_crossentropy',
                optimizer=tensorflow.keras.optimizers.Adam(lr=learning_rate, decay=decay_rate),
                metrics=['accuracy'])
 
-(x_train, y_train) =  training_generator
-with open('mach_data.pickle', 'wb') as f:
-    pickle.dump(x_train, f)
+#with open('mach_data.pickle', 'wb') as f:
+#    pickle.dump(x_train, f)
+
+#history = model1.fit(x_train, y_train, validation_data=(x_val, y_val), steps_per_epoch=5, validation_steps=5, epochs=500)
 
 history = model1.fit(training_generator,
                      steps_per_epoch=5,
@@ -584,6 +612,8 @@ history = model1.fit(training_generator,
                      epochs=500)
 
 model1.save_weights('model_classify_mach_non_mach.h5')
+
+"""
 score, acc = model1.evaluate_generator(test_generator, steps=10)
 print(acc)
 
@@ -622,3 +652,4 @@ plt.ylabel('Loss')
 plt.xlabel('Epoch')
 plt.legend(['Training', 'Validation'], loc='upper right')
 plt.savefig('loss_mach_non_mach.png')
+"""

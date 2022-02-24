@@ -113,8 +113,8 @@ class predict():
         )
 
         # compute SHAP values
-        explainer = shap.DeepExplainer(model, x_train)
-        shap_values = explainer.shap_values(batch_x)
+        #explainer = shap.DeepExplainer(model, x_train)
+        #shap_values = explainer.shap_values(batch_x)
         
         result = self.model.predict(batch_x)
         res = ""
