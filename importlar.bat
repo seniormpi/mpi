@@ -9,3 +9,8 @@ pip install pyside6
 pip install mayavi
 pip install pyqt5
 pip install git+https://github.com/cpederkoff/stl-to-voxel.git
+pip install keras
+pip install tensorflow
+pip install pandas
+pip install livelossplot
+pip install tikzplotlib
