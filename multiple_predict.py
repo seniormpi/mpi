@@ -54,26 +54,26 @@ for filename in os.listdir('deneme'):
         if (result2[:][result2[:] >= 0.5]):
             res2 = "machinable"
 
-        if (res2 == "not machinable"):
+        """if (res2 == "not machinable"):
             print(filename, " " , res2)
-        else:    
-            batch_input2 = []
-            with open('./deneme/' + filename, 'rb') as file:
-                try:
-                    data = np.int32(binvox_rw.read_as_3d_array(file).data)
-                except:
-                    print("-----------------------------" , filename)
-            model_input = np.reshape(data, (64, 64, 64, 1))
-            batch_input2 = [model_input]
-            batch_x = np.array(batch_input2)
-            result = model.predict(batch_x)
-            res = ""
-            if (result[:, 0][result[:, 0] >= 0.5]):  # = 1
-                res += "Milling "
-            if (result[:, 1][result[:, 1] >= 0.5]):  # = 1
-                res += "Turning "
-            if (result[:, 1][result[:, 1] < 0.5]):  # = 0
-                res += " "
-            if (result[:, 0][result[:, 0] < 0.5]):  # = 0
-                res += " "
-            print(filename, " " , res2 , "procidure: ", res)
+        else: """   
+        batch_input2 = []
+        with open('./deneme/' + filename, 'rb') as file:
+            try:
+                data = np.int32(binvox_rw.read_as_3d_array(file).data)
+            except:
+                print("-----------------------------" , filename)
+        model_input = np.reshape(data, (64, 64, 64, 1))
+        batch_input2 = [model_input]
+        batch_x = np.array(batch_input2)
+        result = model.predict(batch_x)
+        res = ""
+        if (result[:, 0][result[:, 0] >= 0.5]):  # = 1
+            res += "Milling "
+        if (result[:, 1][result[:, 1] >= 0.5]):  # = 1
+            res += "Turning "
+        if (result[:, 1][result[:, 1] < 0.5]):  # = 0
+            res += " "
+        if (result[:, 0][result[:, 0] < 0.5]):  # = 0
+            res += " "
+        print(filename, " " , res2 , "procidure: ", res)
