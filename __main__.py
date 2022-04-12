@@ -14,8 +14,14 @@ from mayavi.core.ui.api import MayaviScene, MlabSceneModel, \
     SceneEditor
 from traits.api import HasTraits, Instance, on_trait_change
 from traitsui.api import View, Item
+from PyQt5.QtWidgets import *
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from slicer.my_slicer import *
 
 from predict import predict
+import measure_volume
 
 copied_stl_path = ".\\out\\input.stl"
 
@@ -95,6 +101,8 @@ class MyWidget(QtWidgets.QWidget):
         self.res_label = QLabel("Results: ", self)
         self.result_label = QLabel(" ", self)
         self.result_label2 = QLabel(" ", self)
+        self.result_label3 = QLabel(" ", self)
+        self.result_label4 = QLabel(" ", self)
 
         self.vertical_layout_3 = QVBoxLayout()
 
@@ -104,6 +112,8 @@ class MyWidget(QtWidgets.QWidget):
         vertical_layout_1.addWidget(self.res_label, alignment=QtCore.Qt.AlignCenter)
         vertical_layout_1.addWidget(self.result_label, alignment=QtCore.Qt.AlignCenter)
         vertical_layout_1.addWidget(self.result_label2, alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_1.addWidget(self.result_label3, alignment=QtCore.Qt.AlignCenter)
+        vertical_layout_1.addWidget(self.result_label4, alignment=QtCore.Qt.AlignCenter)
 
         self.stl_widget = vpl.QtFigure()
         self.vertical_layout_3.addWidget(self.stl_widget)
@@ -120,39 +130,76 @@ class MyWidget(QtWidgets.QWidget):
         root.withdraw()
 
         stl_path = filedialog.askopenfilename()
+        subprocess.call('rmdir /q /s out', shell=True)
+        subprocess.call('mkdir out', shell=True)
+        copyfile(stl_path, copied_stl_path)
 
+        stl_path = copied_stl_path
         # enable next step buttons
         if stl_path.endswith('.stl'):
             self.convert_stl_to_binvox_btn.setEnabled(True)
             self.stl_label.setText(stl_path)
             self.show_stl()
 
+    def calculateVolume(self, material):
+        print("material", material)
+        # material = input('1 = ABS or 2 = PLA or 3 = 3k CFRP or 4 = Plexiglass : ')
+        return measure_volume.foo(material, stl_path)
+
     # stl model gösterme
     def show_stl(self):
         global shown_stl
+        global copied_stl_path
         if shown_stl:
             for i in reversed(range(self.vertical_layout_3.count())):
                 self.vertical_layout_3.itemAt(i).widget().setParent(None)
             self.stl_widget = vpl.QtFigure()
             self.vertical_layout_3.addWidget(self.stl_widget)
+            self.result_label4.setText("")
+            self.result_label3.setText("")
             self.result_label2.setText("")
             self.result_label.setText("")
 
         mesh = Mesh.from_file(stl_path)
         vpl.mesh_plot(mesh, fig=self.stl_widget)
         self.stl_widget.show()
+        items = {"ABS",
+                 "PLA",
+                 "CFRP",
+                 "Plexiglass",
+                 "Alumide",
+                 "Aluminum",
+                 "Brass",
+                 "Bronze",
+                 "Copper",
+                 "Gold_14K",
+                 "Gold_18K",
+                 "Polyamide_MJF",
+                 "Polyamide_SLS",
+                 "Rubber",
+                 "Silver",
+                 "Steel",
+                 "Titanium",
+                 "Resin"
+                 }
+
+        materyal, ok = QInputDialog.getItem(self, "Material",
+                                        "List of materials", items, 0, False)
+
+        totalVolume = self.calculateVolume(materyal)
+        print("totalVolume", totalVolume)
+        self.result_label3.setText(totalVolume)
+
+        est_hours, est_mins = slice_new(copied_stl_path, materyal)
+        est = "Estimated build time: {:d}h {:02d}m".format(est_hours,est_mins)
+        self.result_label4.setText(est)
 
         shown_stl = 1
 
     # stl to binvox convert
     def convert_binvox(self):
         global copied_stl_path
-        global stl_path
 
-        # clean create output directory
-        subprocess.call('rmdir /q /s out', shell=True)
-        subprocess.call('mkdir out', shell=True)
-        copyfile(stl_path, copied_stl_path)
         subprocess.call(['.\\executables\\binvox.exe', '-c', '-d', '64', copied_stl_path])
 
         # enable next step buttons
@@ -182,6 +229,7 @@ class MyWidget(QtWidgets.QWidget):
             a += predict().predict_mpi()
             self.result_label2.setText(a)
 
+
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, widget):
         QtWidgets.QMainWindow.__init__(self)
@@ -196,6 +244,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
+    # clean create output directory
+
     app = QtWidgets.QApplication(sys.argv)
 
     widget = MyWidget()
