@@ -42,7 +42,55 @@ model2.load_weights('models/model_classify_mach_non_mach.h5')
 isMach =  []
 howMach = []
 y_true = []
-y_true2 = [1, 2, 3, 1, 1, 1, 2, 3, 2 ,3 ,1 ,2 ,3 , 2, 1, 1 ,2 ,1, 1, 2 ,3, 1, 2, 1, 1, 1, 2, 2, 2, 2, 1, 2, 1, 2, 3, 1, 2, 3, 1, 2, 2, 2, 2, 1 , 2 , 1, 1, 1]
+y_true2 = [1, #1
+           1, #10
+           1, #11
+           1, #12
+           1, #13
+           1, #14
+           1, #15
+           1, #17
+           2, #18
+           2, #19
+           1, #2
+           2, #20
+           2, #21
+           3, #23
+           3, #25
+           3, #26
+           1, #27
+           3, #28
+           1, #29
+           1, #3
+           2, #30
+           2, #31
+           3, #32
+           2, #33
+           2, #34
+           3, #35
+           3, #36
+           3, #37
+           2, #38
+           1, #39
+           1, #4
+           2, #40
+           2, #41
+           3, #42
+           1, #43
+           1, #44
+           2, #45
+           2, #46
+           1, #49
+           1, #5
+           1, #50
+           1, #51
+           2, #52
+           2, #53
+           1, #6
+           1, #7
+           1, #8
+           1] #9
+           
 
 for filename in os.listdir('deneme'):
         batch_input = []
@@ -92,7 +140,7 @@ for filename in os.listdir('deneme'):
         if (result[:, 0][result[:, 0] < 0.5]):  # = 0
             res += " "
         howMach.append(count)
-        #print(filename, " " , res2 , "procidure: ", res)
+        print(filename, " " , res2 , "procidure: ", res)
 
 
 # Define by steps in predict_generator * batch_size
