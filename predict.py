@@ -21,7 +21,7 @@ class predict():
     model.add(Dense(128, activation='relu', kernel_regularizer=regularizers.l2(0.0)))
     model.add(Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.0)))
     model.add(Dense(2, activation='sigmoid'))
-    modded = true
+    modded = False
     if modded:
         model.load_weights('models/model_mpi_mod.h5')
     else:
