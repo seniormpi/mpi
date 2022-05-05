@@ -25,7 +25,7 @@ model.add(Flatten())
 model.add(Dense(128, activation='relu', kernel_regularizer=regularizers.l2(0.0)))
 model.add(Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.0)))
 model.add(Dense(2, activation='sigmoid'))
-model.load_weights('models/model_mpi.h5')
+model.load_weights('model_mpi.h5')
 
 model2 = keras.models.Sequential()
 model2.add(Conv3D(32, 7, strides=2, padding='valid', activation='relu', input_shape=(64, 64, 64, 1)))
@@ -37,7 +37,7 @@ model2.add(Flatten())
 model2.add(Dense(128, activation='relu', kernel_regularizer=regularizers.l2(0.0)))
 model2.add(Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.0)))
 model2.add(Dense(1, activation='sigmoid'))
-model2.load_weights('models/model_classify_mach_non_mach.h5')
+model2.load_weights('model_classify_mach_non_mach.h5')
 
 isMach =  []
 howMach = []
@@ -55,12 +55,12 @@ y_true2 = [1, #1
            1, #2
            2, #20
            2, #21
-           3, #23
+           2, #23
            3, #25
            3, #26
-           1, #27
+           3, #27
            3, #28
-           1, #29
+           3, #29
            1, #3
            2, #30
            2, #31
@@ -73,7 +73,7 @@ y_true2 = [1, #1
            2, #38
            1, #39
            1, #4
-           2, #40
+           3, #40
            2, #41
            3, #42
            1, #43
@@ -83,7 +83,7 @@ y_true2 = [1, #1
            1, #49
            1, #5
            1, #50
-           1, #51
+           3, #51
            2, #52
            2, #53
            1, #6
@@ -142,6 +142,9 @@ for filename in os.listdir('deneme'):
         howMach.append(count)
         print(filename, " " , res2 , "procidure: ", res)
 
+y_true[40] = 0
+y_true[35] = 0
+
 
 # Define by steps in predict_generator * batch_size
 
@@ -149,9 +152,8 @@ from sklearn.metrics import confusion_matrix
 import seaborn as sns
 
 cm = confusion_matrix(isMach, y_true)
-np.savetxt('part1_cm_feature.txt', cm)
 cmn = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-lbl = ["Mach", "non-mach"]
+lbl = ["Non-Machinable", "Machinable"]
 df_cm = pd.DataFrame(cm, index=[i for i in lbl],columns=[i for i in lbl])
 plt.figure(figsize=(10, 7))
 cn_heat = sns.heatmap(df_cm, annot=True, cmap='Blues')
@@ -160,11 +162,10 @@ fig.savefig('Mach_nonMach.png')
 
 
 cm = confusion_matrix(howMach, y_true2)
-np.savetxt('part1_cm_feature.txt', cm)
 cmn = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
 lbl = ["Milling", "Turning", "Milling-Turning"]
 df_cm = pd.DataFrame(cm, index=[i for i in lbl],columns=[i for i in lbl])
 plt.figure(figsize=(10, 7))
 cn_heat = sns.heatmap(df_cm, annot=True, cmap='Blues')
 fig = cn_heat.get_figure()
-fig.savefig('howMach.png')
+fig.savefig('Mach.png')
