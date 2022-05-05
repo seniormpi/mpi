@@ -3,7 +3,7 @@ import os.path
 import argparse
 
 # import pyximport; pyximport.install()
-from .slicer import Slicer
+from .slicermpi import Slicer
 from .stl_data import StlData
 
 
