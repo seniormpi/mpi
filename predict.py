@@ -7,8 +7,6 @@ from keras.layers.convolutional import Conv3D
 from keras import regularizers
 from math import log2, inf
 import pickle
-import shap
-
 
 class predict():
     model = keras.models.Sequential()
@@ -106,8 +104,8 @@ class predict():
     def predict_mpi(self):
         # predict of real parts with model 2
 
-        with open('process_data.pickle', 'rb') as f:
-            x_train = pickle.load(f)
+        #with open('process_data.pickle', 'rb') as f:
+           # x_train = pickle.load(f)
         
         batch_input = []
         with open("./out/input.binvox", 'rb') as file:
