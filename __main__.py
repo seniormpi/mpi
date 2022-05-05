@@ -18,8 +18,7 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from slicer.my_slicer import *
-
+import slicermpi.my_slicer as sc
 from predict import predict
 import measure_volume
 
@@ -190,7 +189,7 @@ class MyWidget(QtWidgets.QWidget):
         print("totalVolume", totalVolume)
         self.result_label3.setText(totalVolume)
 
-        est_hours, est_mins = slice_new(copied_stl_path, materyal)
+        est_hours, est_mins = sc.slice_new(copied_stl_path, materyal)
         est = "Estimated build time: {:d}h {:02d}m".format(est_hours,est_mins)
         self.result_label4.setText(est)
 
